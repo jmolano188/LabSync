@@ -33,7 +33,7 @@ model Professional {
   IdProfessional Int      @id @default(autoincrement())
   Name           String   @db.VarChar(240) // Nombre del profesional que realiza la orden
   Register       String   @db.VarChar(20) // Numero de registro medico del profesional
-  Identification String   @db.VarChar(10) // Identificacion del profesional
+  Identification String   @unique @db.VarChar(10) // Identificacion del profesional
   specialty      String   @db.VarChar(100) // Especialidad del profesional
   orders         Orders[]
 }
