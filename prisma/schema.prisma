@@ -13,48 +13,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model patient{
-  Id Int  @unique @default(autoincrement()) //
-  TipeId String                             // Tipo de identificacion del paciente 
-  Identification String @db.VarChar(10)     // Numero de identificacion del paciente
-  FirstName String @db.VarChar(20)          // Primer nombre del paciente
-  SecondName String @db.VarChar(20)         // Segundo nombre del paciente
-  FirstLastName String @db.VarChar(30)      // Primer apellido del paciente
-  SecondLastName String @db.VarChar(30)     // Segundo apellido del paciente
-  Birthdate DateTime                        // Fecha de nacimiento del paciente
-  Age Int                                   // Edad del paciente
-  Phone String @db.VarChar(10)              // Numero de celular del paciente 
-  Email String @db.VarChar(60)              // Correo electronico del paciente
-  Gender String @db.VarChar(30)             // Sexo del paciente
+model Patient {
+  IdPatient      Int    @id @default(autoincrement()) //
+  TipeId         String                   // Tipo de identificacion del paciente cc
+  Identification String   @db.VarChar(10) // Numero de identificacion del paciente
+  FirstName      String   @db.VarChar(20) // Primer nombre del paciente
+  SecondName     String   @db.VarChar(20) // Segundo nombre del paciente
+  FirstLastName  String   @db.VarChar(30) // Primer apellido del paciente
+  SecondLastName String   @db.VarChar(30) // Segundo apellido del paciente
+  Birthdate      DateTime                 // Fecha de nacimiento del paciente
+  Age            Int                      // Edad del paciente
+  Phone          String   @db.VarChar(10) // Numero de celular del paciente 
+  Email          String   @db.VarChar(60) // Correo electronico del paciente
+  Gender         String   @db.VarChar(30) // Sexo del paciente masculino indeterminado femenino
+  orders         Orders[]
 }
-model professional{
-  Id Int @unique @default(autoincrement())
-  Name String @db.VarChar(240)              // Nombre del profesional que realiza la orden
-  Register String @db.VarChar(20)           // Numero de registro medico del profesional
-  Identification String @db.VarChar(10)     // Identificacion del profesional
-  specialty String @db.VarChar(100)         // Especialidad del profesional
-} 
-model Orders{
-  Id Int @unique @default(autoincrement())
 
-  DateOrder DateTime                        // Fecha de realización de la orden médica
-  State Boolean                             // Estado de la orden médica
-  Diagnostic String @db.VarChar(4)          // Código del diagnostico clínico del paciente
+model Professional {
+  IdProfessional Int      @id @default(autoincrement())
+  Name           String   @db.VarChar(240) // Nombre del profesional que realiza la orden
+  Register       String   @db.VarChar(20) // Numero de registro medico del profesional
+  Identification String   @db.VarChar(10) // Identificacion del profesional
+  specialty      String   @db.VarChar(100) // Especialidad del profesional
+  orders         Orders[]
+}
 
+model Orders {
+  IdOrders       Int          @id @default(autoincrement())
+  DateOrder      DateTime // Fecha de realización de la orden médica
+  State          Boolean // Estado de la orden médica
+  IdPatient      Int          @unique
+  patient        Patient      @relation(fields: [IdPatient], references: [IdPatient])
+  IdProfessional Int          @unique
+  professional   Professional @relation(fields: [IdProfessional], references: [IdProfessional])
+  itemorders     ItemsOrder[]
+  CodeDiagnostic String       @unique @db.VarChar(4) // Código del diagnostico clínico del paciente
+  diagnostic     Diagnostics  @relation(fields: [CodeDiagnostic], references: [CodeDiagnostic])
 }
-model ItemsOrder{
-  Id Int @unique @default(autoincrement())
-  Service String @db.VarChar(8)             // Código CUPS del servicio
-  Description String @db.VarChar(240)       // Descripción médica
 
+model ItemsOrder {
+  Id          Int      @id @default(autoincrement())
+  Service     String   @unique @db.VarChar(8) // Código CUPS del servicio
+  Description String   @db.VarChar(240) // Descripción médica
+  orders      Orders   @relation(fields: [IdOrders], references: [IdOrders])
+  IdOrders    Int      @unique
+  services    Services @relation(fields: [Service], references: [CodeService])
 }
-model Diagnostics{
-  Id Int @unique @default(autoincrement())
-  CodeDiagnostic String @db.VarChar(4)      // Código del dianóstico clínico
-  NameDiagnostic String @db.VarChar(250)    // Nombre del diagnóstico clínico
+
+model Diagnostics {
+  IdDiagnostic   Int     @id @default(autoincrement())
+  CodeDiagnostic String  @unique @db.VarChar(4) // Código del dianóstico clínico
+  NameDiagnostic String  @db.VarChar(250) // Nombre del diagnóstico clínico
+  orders         Orders?
 }
+
 model Services {
-  Id Int @unique @default(autoincrement())
-  CodeService String @db.VarChar(8)         // Codigo del servicio solicitado por el profesional
-  NameService String @db.VarChar(250)       // Nombre del servicio solicitado por el profesional
+  IdServices  Int         @id @default(autoincrement())
+  CodeService String      @unique @db.VarChar(8) // Codigo del servicio solicitado por el profesional
+  NameService String      @db.VarChar(250) // Nombre del servicio solicitado por el profesional
+  itemsOrder  ItemsOrder?
 }
