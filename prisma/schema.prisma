@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model patient{
+  Id Int  @unique @default(autoincrement()) //
+  TipeId String                             // Tipo de identificacion del paciente 
+  Identification String @db.VarChar(10)     // Numero de identificacion del paciente
+  FirstName String @db.VarChar(20)          // Primer nombre del paciente
+  SecondName String @db.VarChar(20)         // Segundo nombre del paciente
+  FirstLastName String @db.VarChar(30)      // Primer apellido del paciente
+  SecondLastName String @db.VarChar(30)     // Segundo apellido del paciente
+  Birthdate DateTime                        // Fecha de nacimiento del paciente
+  Age Int                                   // Edad del paciente
+  Phone String @db.VarChar(10)              // Numero de celular del paciente 
+  Email String @db.VarChar(60)              // Correo electronico del paciente
+  Gender String @db.VarChar(30)             // Sexo del paciente
+}
+model professional{
+  Id Int @unique @default(autoincrement())
+  Name String @db.VarChar(240)              // Nombre del profesional que realiza la orden
+  Register String @db.VarChar(20)           // Numero de registro medico del profesional
+  Identification String @db.VarChar(10)     // Identificacion del profesional
+  specialty String @db.VarChar(100)         // Especialidad del profesional
+} 
+model Orders{
+  Id Int @unique @default(autoincrement())
+
+  DateOrder DateTime                        // Fecha de realización de la orden médica
+  State Boolean                             // Estado de la orden médica
+  Diagnostic String @db.VarChar(4)          // Código del diagnostico clínico del paciente
+
+}
+model ItemsOrder{
+  Id Int @unique @default(autoincrement())
+  Service String @db.VarChar(8)             // Código CUPS del servicio
+  Description String @db.VarChar(240)       // Descripción médica
+
+}
+model Diagnostics{
+  Id Int @unique @default(autoincrement())
+  CodeDiagnostic String @db.VarChar(4)      // Código del dianóstico clínico
+  NameDiagnostic String @db.VarChar(250)    // Nombre del diagnóstico clínico
+}
+model Services {
+  Id Int @unique @default(autoincrement())
+  CodeService String @db.VarChar(8)         // Codigo del servicio solicitado por el profesional
+  NameService String @db.VarChar(250)       // Nombre del servicio solicitado por el profesional
+}
