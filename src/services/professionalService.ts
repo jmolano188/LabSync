@@ -1,12 +1,13 @@
 import {PrismaClient, Professional} from "@prisma/client";
 
+const prisma = new PrismaClient;
+
 export class ProfessionalService {
 
-    constructor(private readonly prisma: PrismaClient) {
-    }
+
      findAll(){
         try {
-            return  this.prisma.professional.findMany();
+            return  prisma.professional.findMany();
         }catch (error){
             console.log("error al obtener todos los profesionales")
         }
@@ -14,7 +15,7 @@ export class ProfessionalService {
 
     findOne(idProfessional: number){
         try {
-            return  this.prisma.professional.findUnique({where:{IdProfessional:idProfessional}});
+            return  prisma.professional.findUnique({where:{IdProfessional:idProfessional}});
         }catch (error){
             console.log("Error al buscar el profesiona")
         }
@@ -22,28 +23,35 @@ export class ProfessionalService {
 
    findByIdentification(identification: string){
        try {
-           return  this.prisma.professional.findUnique({where:{Identification:identification}});
+           return  prisma.professional.findUnique({where:{Identification:identification}});
        }catch (error){
            console.log("error al obtener todos los profesionales")
        }
    }
 
-   async create(objeto: Professional) {
+   async create(objeto: any) {
        const profesional = await this.findByIdentification(objeto.Identification);
        if (profesional) return null;
-       return  this.prisma.professional.create({data: objeto});
+       return  prisma.professional.create({data:objeto});
    }
 
-   async update(objeto: Professional) {
+   async update(objeto:any) {
        const profesional = await this.findOne(objeto.IdProfessional);
+       console.log(objeto.IdProfessional)
        if(!profesional) return null;
-       return this.prisma.professional.create({data:objeto});
+       return prisma.professional.update({where:{IdProfessional:profesional.IdProfessional,
+        Identification:profesional.Identification},
+        data:
+        {
+        Name:objeto.Name,
+        Register:objeto.Register,
+        Identification:objeto.Identification,
+        specialty:objeto.specialty,}});
    }
 
    async  delete(idProfesional: number){
        const profesional = await this.findOne(idProfesional);
        if(!profesional) return null;
-       this.prisma.professional.delete({where:{IdProfessional:idProfesional}});
+       return prisma.professional.delete({where:{IdProfessional:idProfesional}});
    }
-
 }
