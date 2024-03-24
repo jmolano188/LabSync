@@ -16,7 +16,7 @@ datasource db {
 model Patient {
   IdPatient      Int    @id @default(autoincrement()) //
   TipeId         String                   // Tipo de identificacion del paciente cc
-  Identification String   @db.VarChar(10) // Numero de identificacion del paciente
+  Identification String   @unique @db.VarChar(10) // Numero de identificacion del paciente
   FirstName      String   @db.VarChar(20) // Primer nombre del paciente
   SecondName     String   @db.VarChar(20) // Segundo nombre del paciente
   FirstLastName  String   @db.VarChar(30) // Primer apellido del paciente
@@ -40,8 +40,8 @@ model Professional {
 
 model Orders {
   IdOrders       Int          @id @default(autoincrement())
-  DateOrder      DateTime // Fecha de realización de la orden médica
-  State          Boolean // Estado de la orden médica
+  DateOrder      DateTime                   // Fecha de realización de la orden médica
+  State          Boolean                    // Estado de la orden médica
   IdPatient      Int          @unique
   patient        Patient      @relation(fields: [IdPatient], references: [IdPatient])
   IdProfessional Int          @unique
@@ -53,8 +53,8 @@ model Orders {
 
 model ItemsOrder {
   Id          Int      @id @default(autoincrement())
-  Service     String   @unique @db.VarChar(8) // Código CUPS del servicio
-  Description String   @db.VarChar(240) // Descripción médica
+  Service     String   @unique @db.VarChar(8)       // Código CUPS del servicio
+  Description String   @db.VarChar(240)             // Descripción médica
   orders      Orders   @relation(fields: [IdOrders], references: [IdOrders])
   IdOrders    Int      @unique
   services    Services @relation(fields: [Service], references: [CodeService])
@@ -62,14 +62,14 @@ model ItemsOrder {
 
 model Diagnostics {
   IdDiagnostic   Int     @id @default(autoincrement())
-  CodeDiagnostic String  @unique @db.VarChar(4) // Código del dianóstico clínico
-  NameDiagnostic String  @db.VarChar(250) // Nombre del diagnóstico clínico
+  CodeDiagnostic String  @unique @db.VarChar(4)     // Código del dianóstico clínico
+  NameDiagnostic String  @db.VarChar(250)           // Nombre del diagnóstico clínico
   orders         Orders?
 }
 
 model Services {
   IdServices  Int         @id @default(autoincrement())
-  CodeService String      @unique @db.VarChar(8) // Codigo del servicio solicitado por el profesional
-  NameService String      @db.VarChar(250) // Nombre del servicio solicitado por el profesional
+  CodeService String      @unique @db.VarChar(8)  // Codigo del servicio solicitado por el profesional
+  NameService String      @db.VarChar(250)        // Nombre del servicio solicitado por el profesional
   itemsOrder  ItemsOrder?
 }
