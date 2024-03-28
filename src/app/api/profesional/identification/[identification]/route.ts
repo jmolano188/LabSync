@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 import {ProfessionalService} from "@/services/professionalService";
-import { request } from "http";
+
 
 
 const professionalService = new ProfessionalService();

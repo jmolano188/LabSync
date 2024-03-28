@@ -1,5 +1,4 @@
 import {NextResponse} from "next/server";
-import {ProfessionalService} from "@/services/professionalService";
 import { PatientService } from "@/services/patientService";
 
 
