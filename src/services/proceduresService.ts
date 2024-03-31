@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient
 
-export class ServiceService {
+export class proceduresService {
 
     findAll(){
     try {
