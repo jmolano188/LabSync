@@ -34,6 +34,7 @@ export class PatientService {
         if (patient) return null;
         return prisma.patient.create({ data: objeto});
     }
+    
     async update(objeto: any) {
         const patient = await this.findOne(objeto.IdPatient);
         console.log(objeto.IdPatient);

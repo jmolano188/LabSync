@@ -73,3 +73,9 @@ model Services {
   NameService String      @db.VarChar(250)        // Nombre del servicio solicitado por el profesional
   itemsOrder  ItemsOrder?
 }
+model Users{
+  IdUser Int @id @default(autoincrement())
+  Username String @unique @db.VarChar(80)
+  Email String @db.VarChar(50)
+  Password String
+}

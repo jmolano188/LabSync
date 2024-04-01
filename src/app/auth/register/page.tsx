@@ -1,9 +1,30 @@
 'use client'
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form"
+
 function Register(){
+    const router = useRouter()
     const {register,handleSubmit, formState:{errors}} = useForm();
-    const onSubmit =handleSubmit(data => console.log(data))
-    console.log(errors)
+    const onSubmit =handleSubmit(async data =>{
+        if (!(data.password === data.confirmPassword)){
+            return alert("Las contraseñas no coinciden")
+        }
+        const res = await fetch('/api/users',{
+            method: 'POST',
+            body: JSON.stringify({
+            Username: data.username,
+            Email: data.email,
+            Password: data.password,
+            }),
+            headers:{
+            'content-type': 'aplication/json'
+        }
+    }) 
+    if(res.ok) {
+        router.push('/auth/login')
+    }
+    console.log(res)
+    })
     return(
         <div className="h-[calc(100vh-7rem)] flex justify-center items-center">
             <form onSubmit={onSubmit} className="w-1/4">
@@ -11,7 +32,7 @@ function Register(){
 
                 <label htmlFor="username" className="text-slate-500 mb-2 block">Usuario</label>
                 <input type="text"
-                {...(register("username"),{
+                {...register("username",{
                     required:true,
                 })}
                 className="p-3 rounded block mb-2 bg-slate-900
@@ -21,7 +42,7 @@ function Register(){
 
                 <label htmlFor="email" className="text-slate-500 mb-2 block">Correo</label>
                 <input type="email" 
-                {...(register("email"),{
+                {...register("email",{
                     required:true,
                 })}
                 className="p-3 rounded block mb-2 bg-slate-900
@@ -31,7 +52,7 @@ function Register(){
 
                 <label htmlFor="password" className="text-slate-500 mb-2 block">Contraseña</label>
                 <input type="password"
-                {...(register("password"),{
+                {...register("password",{
                     required:true,
                 })}
                 className="p-3 rounded block mb-2 bg-slate-900
@@ -41,7 +62,7 @@ function Register(){
 
                 <label htmlFor="confirmPassword" className="text-slate-500 mb-2 block">Confirmar Contraseña</label>
                 <input type="password"
-                {...(register("confirmPassword"),{
+                {...register("confirmPassword",{
                     required:true,
                 })} 
                 className="p-3 rounded block mb-2 bg-slate-900
