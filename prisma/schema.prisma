@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,11 +15,13 @@ model Patient {
   SecondName     String   @db.VarChar(20) // Segundo nombre del paciente
   FirstLastName  String   @db.VarChar(30) // Primer apellido del paciente
   SecondLastName String   @db.VarChar(30) // Segundo apellido del paciente
-  Birthdate      DateTime                 // Fecha de nacimiento del paciente
+  Birthdate      DateTime                // Fecha de nacimiento del paciente
   Age            Int                      // Edad del paciente
   Phone          String   @db.VarChar(10) // Numero de celular del paciente 
   Email          String   @db.VarChar(60) // Correo electronico del paciente
   Gender         String   @db.VarChar(30) // Sexo del paciente masculino indeterminado femenino
+  CreateAt       DateTime @default(now())
+  UpdateAt       DateTime @default(now())
   orders         Orders[]
 }
 

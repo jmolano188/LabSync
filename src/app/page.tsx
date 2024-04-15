@@ -1,6 +1,7 @@
+import Patient from "./pages/components/Patient";
 function HomePage(){
     return(
-        <div>Home</div>
+        <Patient/>
     )
 }
 export default HomePage;

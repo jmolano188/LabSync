@@ -1,3 +1,8 @@
-export default function FirstPost() {
-    return <h1>patients</h1>;
+import Patient from "../components/Patient";
+
+function Patients() {
+  return (
+    <Patient/>
+  )
 }
+export default Patients

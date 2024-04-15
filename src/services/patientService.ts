@@ -19,7 +19,7 @@ export class PatientService {
         } catch (error) {
             console.log('no se pudo encontrar el paciente');
         }
-    }
+    }   
     findByIdentification(identification: string) {
         try {
             return prisma.patient.findUnique({
@@ -37,7 +37,6 @@ export class PatientService {
     
     async update(objeto: any) {
         const patient = await this.findOne(objeto.IdPatient);
-        console.log(objeto.IdPatient);
         if (!patient) return null;
         return prisma.patient.update({
             where: {
@@ -45,6 +44,7 @@ export class PatientService {
                 Identification: patient.Identification,
             },
             data: {
+                TipeId:objeto.TipeId,
                 FirstName: objeto.FirstName,
                 SecondName: objeto.SecondName,
                 FirstLastName: objeto.FirstLastName,
@@ -52,7 +52,7 @@ export class PatientService {
                 Birthdate: objeto.Birthdate,
                 Phone: objeto.Phone,
                 Email: objeto.Email,
-                Gender: objeto.gender, 
+                Gender: objeto.Gender, 
             },
         });
     }
