@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import {Table,TableContainer,Tbody,Td,Th,Thead,Tr,} from "@chakra-ui/react";
+import {Table,TableContainer,Tbody,Td,Th,Thead,Tr, Input } from "@chakra-ui/react";
+import { serialize } from "v8";
 
 async function loadPatients() {
   const res = await fetch("http://localhost:3000/api/patients");
@@ -10,7 +11,9 @@ async function loadPatients() {
 }
 
 function Patient() {
+  const [search,setSearch] = useState("") 
   const [patients, setPatients] = useState<Array<any>>([]);
+  // traer datos del api
   useEffect(() => {
     const fetchData = async () => {
       const response = await loadPatients();
@@ -18,10 +21,24 @@ function Patient() {
     };
     fetchData();
   }, []);
+  // Funcion de filtrado
+  const searcher = (Event:any) =>{
+    setSearch(Event.target.value)
+    console.log(Event.target)
+  }
+  // Funcion de busqueda
+  const results= !search ? patients : patients.filter(data =>                                                    
+                                                              data.FirstName.toLowerCase().includes(search.toLowerCase()) ||
+                                                              data.SecondName.toLowerCase().includes(search.toLowerCase()) ||
+                                                              data.FirstLastName.toLowerCase().includes(search.toLowerCase()) ||
+                                                              data.SecondLastName.toLowerCase().includes(search.toLowerCase()) ||
+                                                              data.Identification.includes(search));
+  console.log(results)
   return (
 <div>
-
-    <TableContainer>
+    <Input value = {search} onChange={searcher} type="text" placeholder="Search" 
+            focusBorderColor='black' colorScheme="purple" width="500px" />
+    <TableContainer marginTop="20px">
       <Table variant="simple" colorScheme='black'>
         <Thead>
           <Tr>
@@ -36,13 +53,12 @@ function Patient() {
           </Tr>
         </Thead>
         <Tbody>
-          {patients.map((patient) => (
+          {results.map((patient) => (
               <Tr key={patient.IdPatient}>
               <Td>{patient.TipeId}</Td>
               <Td>{patient.Identification}</Td>
               <Td>
-                {patient.FirstName} {patient.SecondName} {patient.FirstLastName}{" "}
-                {patient.SecondLastName}
+                {patient.FirstName} {patient.SecondName} {patient.FirstLastName} {patient.SecondLastName}
               </Td>
               <Td isNumeric>{patient.Age}</Td>
               <Td>{patient.Gender}</Td>
