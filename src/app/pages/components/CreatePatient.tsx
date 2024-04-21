@@ -1,76 +1,108 @@
 'use client'
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form"
+import {  CheckIcon, CloseIcon, RepeatClockIcon } from "@chakra-ui/icons"
+import { Button, FormControl, FormLabel, Input, Select, } from "@chakra-ui/react"
 
-function Register(){
-    const router = useRouter()
-    const {register,handleSubmit, formState:{errors}} = useForm();
-    const onSubmit =handleSubmit(async data =>{
-        if (!(data.password === data.confirmPassword)){
-            return alert("Las contraseñas no coinciden")
-        }
-        const res = await fetch('/api/users',{
-            method: 'POST',
-            body: JSON.stringify({
-            Username: data.username,
-            Email: data.email,
-            Password: data.password,
-            }),
-            headers:{
-            'content-type': 'aplication/json'
-        }
-    }) 
-    if(res.ok) {
-        router.push('/auth/login')
-    }
-    console.log(res)
-    })
-    return(
-        <div className="h-[calc(100vh-7rem)] flex justify-center items-center">
-            <form onSubmit={onSubmit} className="w-1/4">
-                <h1 className="text-slate-200 font-bold text-4xl mb-4 text-center">Registrarse</h1>
+const tipoId =[
+    {value: "AS", label: "ADULTO SIN IDENTIFICACION"}, 
+    {value: "CC", label: "CEDULA DE CIUDADANIA"}, 
+    {value: "CD", label: "CARNET DIPLOMATICO"},
+    {value: "CE", label: "CEDULA DE EXTANJERIA"},
+    {value: "CN", label: "CERTIFICADO DE NACIDO VIVO"}, 
+    {value: "DE", label: "DOCUMENTO EXTERANJERO"}, 
+    {value: "MS", label: "MENOR SIN IDENTIFICACION"}, 
+    {value: "NI", label: "NÚIMERO DE IDENTIFICACION TRIBUTARIO NIT"}, 
+    {value: "NV", label: "CERTIFICADO NACIDO VIVO"},
+    {value: "PA", label: "PASAPORTE "},
+    {value: "PE", label: "PERMISO ESPECIAL DE PERMANENCIA"}, 
+    {value: "PT", label: "PERMIO POR PROTECCION TEMPORAL"},
+    {value: "RC", label: "REGISTRO CIVIL"},
+    {value: "SC", label: "SALVOCONDUCTO"},
+    {value: "SI", label: "SIN IDENTIFICACION"}, 
+    {value: "TI", label: "TARJETA IDENTIDAD"}]
+const genero =[
+        {value: "F", label: "FEMENINO"}, 
+        {value: "M", label: "MASCULINO"}, 
+        {value: "I", label: "INDETERMINADO O INTERSEXUAL"}]
 
-                <label htmlFor="username" className="text-slate-500 mb-2 block">Usuario</label>
-                <input type="text"
-                {...register("username",{
-                    required:true,
-                })}
-                className="p-3 rounded block mb-2 bg-slate-900
-                text-slate-300 w-full"
-                placeholder = 'Usuario123'/>
-                {errors.username && <span className='text-red-500 text-sm'>Este campo es requerido</span>}
+function CreatePatient (){
+return(
+<div>
+<form action="">
+<div className="flex mt-10">
+    <FormControl mr={5} ml={5}>
+        <FormLabel >Identificación</FormLabel>
+        <Input  placeholder='Identificaión' type="number" />
+    </FormControl>
+    <FormControl isRequired mr={5}>
+    <FormLabel >Tipo ID </FormLabel>
+    <Select placeholder="Seleccione"  >
+        {tipoId.map((option,index)=>(
+            <option key ={index} value={option.value}>
+                {option.label}
+            </option>
+        ))}
+    </Select>
+    </FormControl>
+    <FormControl isRequired mr={5} >
+        <FormLabel>Primer Nombre</FormLabel>
+        <Input placeholder='Primer Nombre' />
+    </FormControl>
+    <FormControl mr={5} >
+        <FormLabel>Segundo Nombre</FormLabel>
+        <Input placeholder='Segundo Nombre' />
+    </FormControl>
+    </div>
+    <div className="flex mt-10">
+    <FormControl isRequired mr={5} ml={5} >
+        <FormLabel>Primer Apellido</FormLabel>
+        <Input placeholder='Primer Apellido' />
+    </FormControl>
+    <FormControl  mr={5}>
+        <FormLabel>Segundo Apellido</FormLabel>
+        <Input placeholder='Segundo Apellido' />
+    </FormControl>
+    <FormControl  isRequired mr={5}>
+        <FormLabel>Fecha Nacimiento</FormLabel>
+        <Input type= "date" placeholder='Fecha Nacimiento' />
+    </FormControl>
+    <FormControl  isReadOnly mr={5}>
+        <FormLabel>Edad</FormLabel>
+        <Input />
+    </FormControl>  
+    </div>
+    <div className="flex mt-10">
+    <FormControl isRequired mr={5} ml={5}>
+    <FormLabel > Sexo </FormLabel>
+    <Select placeholder="Seleccione"  >
+        {genero.map((option,index)=>(
+            <option key ={index} value={option.value}>
+                {option.label}
+            </option>
+        ))}
+    </Select>
+    </FormControl>
+    <FormControl isRequired mr={5}  >
+        <FormLabel>Celular</FormLabel>
+        <Input type="number" maxLength={10} placeholder='Celular' />
+    </FormControl>
+    <FormControl  mr={5}>
+        <FormLabel>Correo</FormLabel>
+        <Input type="mail" placeholder='Correo eléctronico' />
+    </FormControl>
+    </div>
+    <div className="flex gap-3">
+    <Button  colorScheme="green" >
+    <CheckIcon/>Guardar
+    </Button>
+    <Button colorScheme="yellow" >
+    <RepeatClockIcon/> Cancelar
+    </Button>
+    <Button colorScheme="red" >
+    <CloseIcon/> Salir
+    </Button>
+    </div>
+</form>
+</div>
 
-                <label htmlFor="email" className="text-slate-500 mb-2 block">Correo</label>
-                <input type="email" 
-                {...register("email",{
-                    required:true,
-                })}
-                className="p-3 rounded block mb-2 bg-slate-900
-                text-slate-300 w-full"
-                placeholder = 'correo@email.com'/>
-                {errors.email && <span className='text-red-500 text-sm'>Este campo es requerido</span>}
-
-                <label htmlFor="password" className="text-slate-500 mb-2 block">Contraseña</label>
-                <input type="password"
-                {...register("password",{
-                    required:true,
-                })}
-                className="p-3 rounded block mb-2 bg-slate-900
-                text-slate-300 w-full"
-                placeholder='********' />
-                {errors.password && <span className='text-red-500 text-sm'>Por favor introduzca la contraseña</span>}
-
-                <label htmlFor="confirmPassword" className="text-slate-500 mb-2 block">Confirmar Contraseña</label>
-                <input type="password"
-                {...register("confirmPassword",{
-                    required:true,
-                })} 
-                className="p-3 rounded block mb-2 bg-slate-900
-                text-slate-300 w-full"
-                placeholder = '********'/>
-                {errors.confirmPassword && <span className='text-red-500 text-sm'>Por favor confirme la contraseña</span>}
-                <button className="w-full bg-blue-500 text-white p-3 mt-2 rounded-lg text-3xl">Registrarse</button>
-            </form>
-        </div>
-    )
-} export default Register
+)}
+export default CreatePatient
