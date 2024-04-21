@@ -2,11 +2,9 @@
 import {  CheckIcon, CloseIcon, EditIcon, RepeatClockIcon } from "@chakra-ui/icons"
 import { Button, FormControl, FormLabel, Input, Modal, ModalBody,  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, useDisclosure, } from "@chakra-ui/react"
 import { useForm } from "react-hook-form";
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import { tipoId,genero } from "../../../../public/list";
 function CreatePatient (props:any){
-
-
     const [inputAge, setInputAge] = useState("")
     const [creando,setCreando] = useState(props.crear)
     const [editando,setEditando] = useState(props.editar)
@@ -14,9 +12,14 @@ function CreatePatient (props:any){
     const [editarTabla, setEditarTabla] = useState(props.editarTabla)
     const [cancelar, setCancelar] = useState(false)
     const [salir, setSalir] = useState(false)
+    const [patient, setPatient] = useState(props.patient || {})
     const { isOpen, onOpen, onClose } = useDisclosure()
-
     const {handleSubmit, register} = useForm() 
+    useEffect(() => {
+        if (editarTabla) {
+            setPatient(props.patient || {});
+        }
+      }, [props.patient, editarTabla]);
         async function onSubmit (value:any){
         const fechaNacimiento = new Date(value.Birthdate).toISOString()
         value.Birthdate = fechaNacimiento
@@ -83,66 +86,66 @@ return(
 <div className="flex-wrap">
 <form onSubmit={handleSubmit(onSubmit)}>
 <div className="flex mt-10">
-    <FormControl isRequired isDisabled={creado || editando} mr={5} ml={5}>
+    <FormControl isRequired isReadOnly={creado || editando} mr={5} ml={5}>
     <FormLabel htmlFor="Identification" >Identificación</FormLabel>
-    <Input id="Identification" placeholder='Identificaión' type="number"
+    <Input id="Identification" value={patient.Identification || ''} placeholder='Identificaión' type="number"
     {...register("Identification")}/>
     </FormControl>
-    <FormControl isRequired isDisabled={creado} mr={5}>
+    <FormControl isRequired isReadOnly={creado} mr={5}>
     <FormLabel htmlFor="TipeId" >Tipo ID </FormLabel>
-    <Select id="TipeId" placeholder="Seleccione" {...register("TipeId")} >
-        {tipoId.map((option,index)=>(
+    <Select id="TipeId"  defaultValue={patient.TipeId || ''}  isReadOnly={creado}  placeholder="Seleccione" {...register("TipeId")} >
+        {!creado && tipoId.map((option,index)=>(
             <option key ={index} value={option.value}>
                 {option.label}
             </option>
         ))}
-    </Select>
+            </Select>
     </FormControl>
-    <FormControl isRequired isDisabled={creado} mr={5} >
+    <FormControl isRequired isReadOnly={creado}  mr={5} >
         <FormLabel  htmlFor="FirstName" >Primer Nombre</FormLabel>
-        <Input  id="FirstName" placeholder='Primer Nombre' {...register("FirstName")} />
+        <Input  id="FirstName" defaultValue={patient.FirstName || ''} placeholder='Primer Nombre' {...register("FirstName")} />
     </FormControl>
-    <FormControl mr={5}  isDisabled={creado}>
+    <FormControl mr={5}  isReadOnly={creado}>
         <FormLabel htmlFor="SecondName">Segundo Nombre</FormLabel>
-        <Input id="SecondName" placeholder='Segundo Nombre' {...register("SecondName")} />
+        <Input id="SecondName" defaultValue={patient.SecondName || ''} placeholder='Segundo Nombre' {...register("SecondName")} />
     </FormControl>
     </div>
     <div className="flex mt-10">
-    <FormControl isRequired isDisabled={creado} mr={5} ml={5} >
+    <FormControl isRequired isReadOnly={creado} mr={5} ml={5} >
         <FormLabel  htmlFor="FirstLastName">Primer Apellido</FormLabel>
-        <Input id="FirstLastName" placeholder='Primer Apellido' {...register("FirstLastName")} />
+        <Input id="FirstLastName" defaultValue={patient.FirstLastName || ''}  placeholder='Primer Apellido' {...register("FirstLastName")} />
     </FormControl>
-    <FormControl isDisabled={creado}  mr={5} >
+    <FormControl isReadOnly={creado}  mr={5} >
         <FormLabel htmlFor="SecondLastName" >Segundo Apellido</FormLabel>
-        <Input id="SecondLastName" placeholder='Segundo Apellido' {...register("SecondLastName")} />
+    <Input id="SecondLastName" defaultValue={patient.SecondLastName || ''} placeholder='Segundo Apellido' {...register("SecondLastName")} />
     </FormControl>
-    <FormControl  isRequired isDisabled={creado} mr={5}>
+    <FormControl  isRequired isReadOnly={creado} mr={5}>
         <FormLabel htmlFor="Birthdate">Fecha Nacimiento</FormLabel>
-        <Input id="Birthdate" type= "date" placeholder='Fecha Nacimiento' {...register("Birthdate")} />
+        <Input id="Birthdate" defaultValue={patient.Birthdate || ''} type= "date" placeholder='Fecha Nacimiento' {...register("Birthdate")} />
     </FormControl>
-    <FormControl  isReadOnly isDisabled={creado} mr={5}>
+    <FormControl  isReadOnly  mr={5}>
         <FormLabel htmlFor="Age">Edad</FormLabel>
-        <Input value={inputAge} id="Age" {...register("Age")} />
+        <Input value={patient.Age || inputAge} id="Age" {...register("Age")} />
     </FormControl>  
     </div>
     <div className="flex mt-10">
-    <FormControl isRequired isDisabled={creado} mr={5} ml={5}>
+    <FormControl isRequired isReadOnly={creado} mr={5} ml={5}>
     <FormLabel htmlFor="Gender"> Sexo </FormLabel>
-    <Select id="Gender" placeholder="Seleccione" {...register("Gender")}  >
-        {genero.map((option,index)=>(
+    <Select  id="Gender" isReadOnly={creado} defaultValue={patient.Gender || ''} placeholder="Seleccione" {...register("Gender")}  >
+        {!creado && genero.map((option,index)=>(
             <option key ={index} value={option.value}>
                 {option.label}
             </option>
         ))}
-    </Select>
+            </Select>
     </FormControl>
-    <FormControl isRequired isDisabled={creado} mr={5}   >
+    <FormControl isRequired isReadOnly={creado} mr={5}   >
         <FormLabel htmlFor="Phone">Celular</FormLabel>
-        <Input id="Phone" type="number" maxLength={10} placeholder='Celular' {...register("Phone")} />
+        <Input id="Phone" defaultValue={patient.Phone || ''} type="number" maxLength={10} placeholder='Celular' {...register("Phone")} />
     </FormControl>
-    <FormControl isRequired isDisabled={creado} mr={5}>
+    <FormControl isRequired isReadOnly={creado} mr={5}>
         <FormLabel htmlFor="Email">Correo</FormLabel>
-        <Input id="Email" type="mail" placeholder='Correo eléctronico' {...register("Email")} />
+        <Input id="Email" defaultValue={patient.Email || ''}  type="mail" placeholder='Correo eléctronico' {...register("Email")} />
     </FormControl>
     </div>
     <div className="flex gap-3 mt-96 justify-end">

@@ -16,6 +16,7 @@ function Patient() {
   const [editando, setEditando] = useState(false)
   const [creado, setCreado] = useState(false)
   const [editarTabla, setEditarTabla] = useState(false)
+  const [patient, setPatient] = useState(null)
  
   const handledCreando = ()=>{
     onOpen()
@@ -23,13 +24,24 @@ function Patient() {
     setEditando(false)
     setCreado(false)
     setEditarTabla(false)
+    setPatient(null)
   }
-  const handledEditando =()=>{
+  const handledEditando =(row:any)=>{
+  
     onOpen()
     setEditando(true)
     setCreado(false)
     setCreando(false)
     setEditarTabla(true)
+    console.log(row)
+    setPatient(row)
+  }
+  const handledVisualizar = () =>{
+    onOpen()
+    setEditando(false)
+    setCreado(true)
+    setCreando(false)
+    setEditarTabla(false)
   }
 
   const [patients, setPatients] = useState<Array<any>>([]);
@@ -92,12 +104,12 @@ function Patient() {
               <Td>{patient.Email}</Td>
               <Td> 
               <Tooltip label ="Editar">
-              <Button onClick={handledEditando} w={10} borderRadius = "full" colorScheme="yellow" mr ={1}>
+              <Button onClick={() =>handledEditando(patient)} w={10} borderRadius = "full" colorScheme="yellow" mr ={1}>
               <EditIcon />
               </Button>
               </Tooltip>
               <Tooltip label ="Visualizar">
-              <Button w={10} borderRadius = "full" colorScheme="blue" mr ={1}>
+              <Button onClick={handledVisualizar} w={10} borderRadius = "full" colorScheme="blue" mr ={1}>
               <ViewIcon />
               </Button>
               </Tooltip>
@@ -130,7 +142,8 @@ function Patient() {
         editar={editando}
         creado ={creado}
         editarTabla={editarTabla}
-        salir={closeCreatePatient}/>
+        salir={closeCreatePatient}
+        patient = {patient}/>
         </ModalBody>
         </ModalContent>
     </Modal>
