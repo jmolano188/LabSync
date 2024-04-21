@@ -1,6 +1,8 @@
 'use client'
 import {  CheckIcon, CloseIcon, RepeatClockIcon } from "@chakra-ui/icons"
 import { Button, FormControl, FormLabel, Input, Select, } from "@chakra-ui/react"
+import { useForm } from "react-hook-form";
+import {useState} from 'react'
 
 const tipoId =[
     {value: "AS", label: "ADULTO SIN IDENTIFICACION"}, 
@@ -25,17 +27,48 @@ const genero =[
         {value: "I", label: "INDETERMINADO O INTERSEXUAL"}]
 
 function CreatePatient (){
+
+const [inputAge, setInputAge] = useState("")
+
+const {handleSubmit, register, reset} = useForm() 
+async function onSubmit (value:any){
+    const fechaNacimiento = new Date(value.Birthdate).toISOString()
+    value.Birthdate = fechaNacimiento
+        const res = await fetch('/api/patients',{
+            method: 'POST',
+            body: JSON.stringify({
+                Identification: value.Identification,
+                TipeId: value.TipeId,
+                FirstName: value.FirstName,
+                SecondName:value.SecondName,
+                FirstLastName:value.FirstLastName,
+                SecondLastName: value.SecondLastName,
+                Birthdate: value.Birthdate,
+                Gender: value.Gender,
+                Phone: value.Phone,
+                Email: value.Email
+                }),
+            headers:{
+                'content-type': 'aplication/json'
+            }})
+    const response = await res.json()
+    setInputAge(response.Age)
+}
+const handleClearForm = ()=>{
+    reset()
+}
 return(
-<div>
-<form action="">
+<div className="h-[calc(100vh-7rem)]">
+<form onSubmit={handleSubmit(onSubmit)}>
 <div className="flex mt-10">
-    <FormControl mr={5} ml={5}>
-        <FormLabel >Identificación</FormLabel>
-        <Input  placeholder='Identificaión' type="number" />
+    <FormControl isRequired mr={5} ml={5}>
+    <FormLabel htmlFor="Identification" >Identificación</FormLabel>
+    <Input id="Identification" placeholder='Identificaión' type="number"
+    {...register("Identification")}/>
     </FormControl>
     <FormControl isRequired mr={5}>
-    <FormLabel >Tipo ID </FormLabel>
-    <Select placeholder="Seleccione"  >
+    <FormLabel htmlFor="TipeId" >Tipo ID </FormLabel>
+    <Select id="TipeId" placeholder="Seleccione" {...register("TipeId")} >
         {tipoId.map((option,index)=>(
             <option key ={index} value={option.value}>
                 {option.label}
@@ -44,36 +77,36 @@ return(
     </Select>
     </FormControl>
     <FormControl isRequired mr={5} >
-        <FormLabel>Primer Nombre</FormLabel>
-        <Input placeholder='Primer Nombre' />
+        <FormLabel  htmlFor="FirstName" >Primer Nombre</FormLabel>
+        <Input  id="FirstName" placeholder='Primer Nombre' {...register("FirstName")} />
     </FormControl>
     <FormControl mr={5} >
-        <FormLabel>Segundo Nombre</FormLabel>
-        <Input placeholder='Segundo Nombre' />
+        <FormLabel htmlFor="SecondName">Segundo Nombre</FormLabel>
+        <Input id="SecondName" placeholder='Segundo Nombre' {...register("SecondName")} />
     </FormControl>
     </div>
     <div className="flex mt-10">
     <FormControl isRequired mr={5} ml={5} >
-        <FormLabel>Primer Apellido</FormLabel>
-        <Input placeholder='Primer Apellido' />
+        <FormLabel  htmlFor="FirstLastName">Primer Apellido</FormLabel>
+        <Input id="FirstLastName" placeholder='Primer Apellido' {...register("FirstLastName")} />
     </FormControl>
     <FormControl  mr={5}>
-        <FormLabel>Segundo Apellido</FormLabel>
-        <Input placeholder='Segundo Apellido' />
+        <FormLabel htmlFor="SecondLastName" >Segundo Apellido</FormLabel>
+        <Input id="SecondLastName" placeholder='Segundo Apellido' {...register("SecondLastName")} />
     </FormControl>
     <FormControl  isRequired mr={5}>
-        <FormLabel>Fecha Nacimiento</FormLabel>
-        <Input type= "date" placeholder='Fecha Nacimiento' />
+        <FormLabel htmlFor="Birthdate">Fecha Nacimiento</FormLabel>
+        <Input id="Birthdate" type= "date" placeholder='Fecha Nacimiento' {...register("Birthdate")} />
     </FormControl>
     <FormControl  isReadOnly mr={5}>
-        <FormLabel>Edad</FormLabel>
-        <Input />
+        <FormLabel htmlFor="Age">Edad</FormLabel>
+        <Input value={inputAge} id="Age" {...register("Age")} />
     </FormControl>  
     </div>
     <div className="flex mt-10">
     <FormControl isRequired mr={5} ml={5}>
-    <FormLabel > Sexo </FormLabel>
-    <Select placeholder="Seleccione"  >
+    <FormLabel htmlFor="Gender"> Sexo </FormLabel>
+    <Select id="Gender" placeholder="Seleccione" {...register("Gender")}  >
         {genero.map((option,index)=>(
             <option key ={index} value={option.value}>
                 {option.label}
@@ -82,27 +115,26 @@ return(
     </Select>
     </FormControl>
     <FormControl isRequired mr={5}  >
-        <FormLabel>Celular</FormLabel>
-        <Input type="number" maxLength={10} placeholder='Celular' />
+        <FormLabel htmlFor="Phone">Celular</FormLabel>
+        <Input id="Phone" type="number" maxLength={10} placeholder='Celular' {...register("Phone")} />
     </FormControl>
-    <FormControl  mr={5}>
-        <FormLabel>Correo</FormLabel>
-        <Input type="mail" placeholder='Correo eléctronico' />
+    <FormControl isRequired mr={5}>
+        <FormLabel htmlFor="Email">Correo</FormLabel>
+        <Input id="Email" type="mail" placeholder='Correo eléctronico' {...register("Email")} />
     </FormControl>
     </div>
-    <div className="flex gap-3">
-    <Button  colorScheme="green" >
+    <div className="flex gap-3 mt-96 justify-end">
+    <Button type="submit" colorScheme="green" >
     <CheckIcon/>Guardar
     </Button>
-    <Button colorScheme="yellow" >
+    <Button onClick={handleClearForm} colorScheme="yellow" >
     <RepeatClockIcon/> Cancelar
     </Button>
-    <Button colorScheme="red" >
+    <Button mr={5} colorScheme="red" >
     <CloseIcon/> Salir
     </Button>
     </div>
 </form>
 </div>
-
 )}
 export default CreatePatient

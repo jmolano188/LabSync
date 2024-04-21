@@ -13,10 +13,9 @@ export async function POST(req:Request) {
    console.log(res);
    const CreateAt = new Date()
    const fechaNacimiento = new Date(res.Birthdate)
-   const agems = CreateAt.getTime() -fechaNacimiento.getTime();
+   const agems = CreateAt.getTime() - fechaNacimiento.getTime();
    const dateage = new Date(agems);
    const age = Math.abs(dateage.getUTCFullYear()-1970)
-   console.log(res.CreateAt)
    
       const response = await patientService.create({
       TipeId:res.TipeId,
