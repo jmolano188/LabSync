@@ -11,7 +11,27 @@ async function loadPatients() {
 }
 
 function Patient() {
-  const [search,setSearch] = useState("") 
+  const [search,setSearch] = useState("")
+  const [creando,setCreando] = useState(false)
+  const [editando, setEditando] = useState(false)
+  const [creado, setCreado] = useState(false)
+  const [editarTabla, setEditarTabla] = useState(false)
+ 
+  const handledCreando = ()=>{
+    onOpen()
+    setCreando(true)
+    setEditando(false)
+    setCreado(false)
+    setEditarTabla(false)
+  }
+  const handledEditando =()=>{
+    onOpen()
+    setEditando(true)
+    setCreado(false)
+    setCreando(false)
+    setEditarTabla(true)
+  }
+
   const [patients, setPatients] = useState<Array<any>>([]);
   const { isOpen, onOpen, onClose } = useDisclosure()
   // traer datos del api
@@ -40,7 +60,7 @@ function Patient() {
     <div className="flex-wrap" style={{marginTop:"20px",marginLeft:"50px", marginRight:"50px",marginBottom:"50px"}}>
     <Input value = {search} onChange={searcher} type="text" placeholder="Search" 
           focusBorderColor='black' border={"2px solid black"} width="500px" />
-      <Button onClick={onOpen} colorScheme="green" ml={10} >
+      <Button onClick={handledCreando} colorScheme="green" ml={10} >
       <AddIcon/>Crear paciente</Button>
     </div> 
     <div  style={{marginTop:"50px",marginLeft:"50px", marginRight:"50px",marginBottom:"50px", border:"2px solid black "}} >
@@ -72,7 +92,7 @@ function Patient() {
               <Td>{patient.Email}</Td>
               <Td> 
               <Tooltip label ="Editar">
-              <Button w={10} borderRadius = "full" colorScheme="yellow" mr ={1}>
+              <Button onClick={handledEditando} w={10} borderRadius = "full" colorScheme="yellow" mr ={1}>
               <EditIcon />
               </Button>
               </Tooltip>
@@ -106,8 +126,10 @@ function Patient() {
         <ModalCloseButton />
         <ModalBody>
         <CreatePatient
-        crear={true}
-        editar={false}
+        crear={creando}
+        editar={editando}
+        creado ={creado}
+        editarTabla={editarTabla}
         salir={closeCreatePatient}/>
         </ModalBody>
         </ModalContent>

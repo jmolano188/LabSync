@@ -10,7 +10,8 @@ function CreatePatient (props:any){
     const [inputAge, setInputAge] = useState("")
     const [creando,setCreando] = useState(props.crear)
     const [editando,setEditando] = useState(props.editar)
-    const [creado, setCreado] = useState(false)
+    const [creado, setCreado] = useState(props.creado)
+    const [editarTabla, setEditarTabla] = useState(props.editarTabla)
     const [cancelar, setCancelar] = useState(false)
     const [salir, setSalir] = useState(false)
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -56,7 +57,7 @@ function CreatePatient (props:any){
         onOpen()
     }
     const handleExitModal =()=>{
-        if (cancelar){
+        if (cancelar && !editarTabla){
             setCreado(true)
             setEditando(false)
             setCancelar(false)
