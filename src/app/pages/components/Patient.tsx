@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon, ViewIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import {Table,TableContainer,Tbody,Td,Th,Thead,Tr, Tooltip, Button, Input, Modal, ModalBody,  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,  useDisclosure, } from "@chakra-ui/react"
 import CreatePatient from "./CreatePatient";
+
 async function loadPatients() {
   const res = await fetch("http://localhost:3000/api/patients");
   const response = await res.json();
-  console.log(response);
   return response;
 }
 
@@ -17,31 +17,59 @@ function Patient() {
   const [creado, setCreado] = useState(false)
   const [editarTabla, setEditarTabla] = useState(false)
   const [patient, setPatient] = useState(null)
- 
+  const [openModal1, setOpenModal1] = useState(false)
+  const [deletePatient,setDeletedPatient] = useState(null)
+  const [loading,setLoading] = useState(false)
+
   const handledCreando = ()=>{
-    onOpen()
     setCreando(true)
     setEditando(false)
     setCreado(false)
     setEditarTabla(false)
     setPatient(null)
+    setLoading(true)
+    onOpen()
   }
   const handledEditando =(row:any)=>{
-  
-    onOpen()
     setEditando(true)
     setCreado(false)
     setCreando(false)
     setEditarTabla(true)
-    console.log(row)
     setPatient(row)
-  }
-  const handledVisualizar = () =>{
+    setLoading(true)
     onOpen()
+  }
+  const handledVisualizar = (row:any) =>{
     setEditando(false)
     setCreado(true)
     setCreando(false)
     setEditarTabla(false)
+    setPatient(row)
+    setLoading(false)
+    onOpen()
+  }
+  const handledEliminar = (row:any) =>{
+    setEditando(false)
+    setCreado(false)
+    setCreando(false)
+    setEditarTabla(false)
+    setDeletedPatient(row.IdPatient)
+    setOpenModal1(true)
+  }
+  const onCloseModal1 =() =>setOpenModal1(false)
+  const handleDeletePatient = async () =>{
+    setLoading(true)
+    const response = await fetch('/api/patients/'+deletePatient,{
+      method: 'DELETE',
+      headers:{
+        "Content-Type":"application/json"
+      }})
+    console.log(response)
+    if(response.ok){
+      setLoading(false)
+      onCloseModal1()
+      return;
+    }
   }
 
   const [patients, setPatients] = useState<Array<any>>([]);
@@ -53,13 +81,16 @@ function Patient() {
       setPatients(response);
     };
     fetchData();
-  }, []);
+  }, [loading]);
   // Funcion de filtrado
   const searcher = (Event:any) =>{
     setSearch(Event.target.value)
   }
   const closeCreatePatient =(dato:boolean)=>{
-    dato?onClose():null
+    if (dato){
+      setLoading(false)
+      onClose()
+    }
   }
   // Funcion de busqueda
   const results= !search ? patients : patients.filter(data => {
@@ -78,11 +109,12 @@ function Patient() {
     <div  style={{marginTop:"50px",marginLeft:"50px", marginRight:"50px",marginBottom:"50px", border:"2px solid black "}} >
     <TableContainer overflowX={"auto"} >
       <Table variant="simple" colorScheme='black'>
-        <Thead>
-          <Tr>
+        <Thead backgroundColor={"#FF5B5E"}  >
+          <Tr >
             <Th fontSize="lg"  >TIPO ID</Th>
             <Th fontSize="lg"  >IDENTIFICACION</Th>
             <Th fontSize="lg"  >NOMBRE</Th>
+            <Th fontSize="lg"  >FECHA NACIMIENTO</Th>
             <Th fontSize="lg"   isNumeric>EDAD</Th>
             <Th fontSize="lg"  >SEXO</Th>
             <Th fontSize="lg"  >CELULAR</Th>
@@ -98,6 +130,7 @@ function Patient() {
               <Td >
               {patient.FirstName} {patient.SecondName} {patient.FirstLastName} {patient.SecondLastName}
               </Td>
+              <Td >{patient.Birthdate.split('T')[0]}</Td>
               <Td isNumeric>{patient.Age}</Td>
               <Td>{patient.Gender}</Td>
               <Td>{patient.Phone}</Td>
@@ -109,7 +142,7 @@ function Patient() {
               </Button>
               </Tooltip>
               <Tooltip label ="Visualizar">
-              <Button onClick={handledVisualizar} w={10} borderRadius = "full" colorScheme="blue" mr ={1}>
+              <Button onClick={() => handledVisualizar(patient)} w={10} borderRadius = "full" colorScheme="blue" mr ={1}>
               <ViewIcon />
               </Button>
               </Tooltip>
@@ -119,7 +152,7 @@ function Patient() {
               </Button>
               </Tooltip>
               <Tooltip label ="Eliminar">
-              <Button w={10} borderRadius = "full" colorScheme="red" >
+              <Button onClick={() => handledEliminar(patient)} w={10} borderRadius = "full" colorScheme="red" >
               <DeleteIcon/>
               </Button>
               </Tooltip>
@@ -147,7 +180,32 @@ function Patient() {
         </ModalBody>
         </ModalContent>
     </Modal>
+  
+  <Modal closeOnOverlayClick={false} isOpen={openModal1} onClose={onCloseModal1} isCentered size={"lg"}>
+  <ModalOverlay />
+        <ModalContent>
+        <ModalHeader>
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+        <div >
+        <WarningTwoIcon color={"red"} boxSize={10} mr={4}/>
+            <span style={{fontFamily:'Arial,sans-serif',fontSize:"20px"}}>
+            ¿Seguro desea ELIMINAR el paciente?
+        </span>
+        </div>
+        </ModalBody>
+        <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={handleDeletePatient}>
+            Si
+            </Button>
+            <Button colorScheme="red" onClick={onCloseModal1}>No</Button>
+        </ModalFooter>
+        </ModalContent>
+    </Modal>
+
 </div>
+
 );
 }
 export default Patient;

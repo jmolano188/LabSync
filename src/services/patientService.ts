@@ -5,7 +5,7 @@ const prisma = new PrismaClient
 export class PatientService {
     findAll() {
         try {
-            return prisma.patient.findMany();
+            return prisma.patient.findMany({orderBy:{CreateAt:"desc"}});
         } catch (error) {
             console.log('No se pudo encontrar registros de pacientes');
 

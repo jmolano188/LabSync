@@ -4,6 +4,9 @@ import { Button, FormControl, FormLabel, Input, Modal, ModalBody,  ModalCloseBut
 import { useForm } from "react-hook-form";
 import {useEffect, useState} from 'react'
 import { tipoId,genero } from "../../../../public/list";
+
+
+
 function CreatePatient (props:any){
     const [inputAge, setInputAge] = useState("")
     const [creando,setCreando] = useState(props.crear)
@@ -14,7 +17,7 @@ function CreatePatient (props:any){
     const [salir, setSalir] = useState(false)
     const [patient, setPatient] = useState(props.patient || {})
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const {handleSubmit, register} = useForm() 
+    const {handleSubmit, register} = useForm()
     useEffect(() => {
         if (editarTabla) {
             setPatient(props.patient || {});
@@ -23,6 +26,29 @@ function CreatePatient (props:any){
         async function onSubmit (value:any){
         const fechaNacimiento = new Date(value.Birthdate).toISOString()
         value.Birthdate = fechaNacimiento
+        if(patient.IdPatient){
+        const res = await fetch('/api/patients',{
+            method: 'PUT',
+            body: JSON.stringify({
+                IdPatient:patient.IdPatient,
+                Identification: value.Identification,
+                TipeId: value.TipeId,
+                FirstName: value.FirstName,
+                SecondName:value.SecondName,
+                FirstLastName:value.FirstLastName,
+                SecondLastName: value.SecondLastName,
+                Birthdate: value.Birthdate,
+                Gender: value.Gender,
+                Phone: value.Phone,
+                Email: value.Email
+                }),
+            headers:{
+            'content-type': 'aplication/json'
+            }})
+            setCreando(false)
+            setEditando(false)
+            setCreado(true)
+        }else{
         const res = await fetch('/api/patients',{
             method: 'POST',
             body: JSON.stringify({
@@ -44,7 +70,7 @@ function CreatePatient (props:any){
     setInputAge(response.Age)
     setCreando(false)
     setCreado(true)
-    }
+        }}
     const handleOutForm = ()=>{
         setCreado(false)
         setEditando(false)
@@ -52,8 +78,8 @@ function CreatePatient (props:any){
         onOpen()
     }
     const handleEditForm =()=>{
-            setEditando(true)
-            setCreado(false)
+        setEditando(true)
+        setCreado(false)
     }
     const handleExitForm =()=>{
         setCancelar(false)
@@ -88,17 +114,26 @@ return(
 <div className="flex mt-10">
     <FormControl isRequired isReadOnly={creado || editando} mr={5} ml={5}>
     <FormLabel htmlFor="Identification" >Identificación</FormLabel>
-    <Input id="Identification" value={patient.Identification || ''} placeholder='Identificaión' type="number"
+    <Input id="Identification" defaultValue={patient.Identification || ''} placeholder='Identificaión' type="number"
     {...register("Identification")}/>
     </FormControl>
-    <FormControl isRequired isReadOnly={creado} mr={5}>
-    <FormLabel htmlFor="TipeId" >Tipo ID </FormLabel>
-    <Select id="TipeId"  defaultValue={patient.TipeId || ''}  isReadOnly={creado}  placeholder="Seleccione" {...register("TipeId")} >
-        {!creado && tipoId.map((option,index)=>(
+    <FormControl isRequired  mr={5} isDisabled={creado}>
+    <FormLabel htmlFor="TipeId"
+      _disabled={{ // Personalización para el estado deshabilitado
+        color: '#262B37', // Color de texto más apagado
+        opacity: 1 // Opacidad normal
+      }} >Tipo ID </FormLabel>
+    <Select id="TipeId"   defaultValue={patient.TipeId || ''}  placeholder="Seleccione" {...register("TipeId")}
+     _disabled={{ // Personalización para el estado deshabilitado
+        color: '#262B37', // Color de texto más apagado
+        opacity: 1 // Opacidad normal
+      }} >
+        { tipoId.map((option,index)=>(
             <option key ={index} value={option.value}>
                 {option.label}
             </option>
         ))}
+    
             </Select>
     </FormControl>
     <FormControl isRequired isReadOnly={creado}  mr={5} >
@@ -121,7 +156,7 @@ return(
     </FormControl>
     <FormControl  isRequired isReadOnly={creado} mr={5}>
         <FormLabel htmlFor="Birthdate">Fecha Nacimiento</FormLabel>
-        <Input id="Birthdate" defaultValue={patient.Birthdate || ''} type= "date" placeholder='Fecha Nacimiento' {...register("Birthdate")} />
+        <Input id="Birthdate" defaultValue={patient.Birthdate ? patient.Birthdate.substring(0,10) || '':''} type= "date" placeholder='Fecha Nacimiento' {...register("Birthdate")} />
     </FormControl>
     <FormControl  isReadOnly  mr={5}>
         <FormLabel htmlFor="Age">Edad</FormLabel>
@@ -129,10 +164,18 @@ return(
     </FormControl>  
     </div>
     <div className="flex mt-10">
-    <FormControl isRequired isReadOnly={creado} mr={5} ml={5}>
-    <FormLabel htmlFor="Gender"> Sexo </FormLabel>
-    <Select  id="Gender" isReadOnly={creado} defaultValue={patient.Gender || ''} placeholder="Seleccione" {...register("Gender")}  >
-        {!creado && genero.map((option,index)=>(
+    <FormControl isRequired isDisabled={creado} mr={5} ml={5}>
+    <FormLabel htmlFor="Gender"
+    _disabled={{ // Personalización para el estado deshabilitado
+        color: '#262B37', // Color de texto más apagado
+        opacity: 1 // Opacidad normal
+      }} > Sexo </FormLabel>
+    <Select  id="Gender" isReadOnly={creado} defaultValue={patient.Gender || ''} placeholder="Seleccione" {...register("Gender")} 
+    _disabled={{ // Personalización para el estado deshabilitado
+        color: '#262B37', // Color de texto más apagado
+        opacity: 1 // Opacidad normal
+      }} >
+        { genero.map((option,index)=>(
             <option key ={index} value={option.value}>
                 {option.label}
             </option>
@@ -163,7 +206,7 @@ return(
     </Button>}
     </div>
 </form>
-{<div>
+<div>
 <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose} isCentered size={"lg"} >
 <ModalOverlay />
         <ModalContent>
@@ -187,7 +230,7 @@ return(
         </ModalFooter>
         </ModalContent>
     </Modal>
-</div>}
+</div>
 </div>
 )}
 export default CreatePatient
