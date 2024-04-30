@@ -29,6 +29,17 @@ export class PatientService {
             console.log("error al obtener todos los el paciente");
         }
     }
+    async searchPagination(page:number=1,pageSize:number=10) {
+        const  offset = (page-1)*pageSize; 
+        try {
+            const patientPage = await prisma.patient.findMany({skip:offset,take:pageSize,orderBy:{CreateAt:'desc'}});
+            console.log(patientPage)
+            const patients =  await this.findAll()
+            return({patient:patientPage,totalPatients:patients?.length})
+        } catch (error) {
+            console.log('No se pudo encontrar registros de pacientes');
+
+    }}
     async create(objeto: any) {
         const patient = await this.findByIdentification(objeto.Identification);
         if (patient) return null;

@@ -114,7 +114,7 @@ return(
 <div className="flex mt-10">
     <FormControl isRequired isReadOnly={creado || editando} mr={5} ml={5}>
     <FormLabel htmlFor="Identification" >Identificación</FormLabel>
-    <Input id="Identification" defaultValue={patient.Identification || ''} placeholder='Identificaión' type="number"
+    <Input id="Identification" defaultValue={patient.Identification || ''} placeholder='Identificación' type="number"
     {...register("Identification")}/>
     </FormControl>
     <FormControl isRequired  mr={5} isDisabled={creado}>
@@ -133,7 +133,6 @@ return(
                 {option.label}
             </option>
         ))}
-    
             </Select>
     </FormControl>
     <FormControl isRequired isReadOnly={creado}  mr={5} >

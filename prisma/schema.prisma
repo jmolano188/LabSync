@@ -50,7 +50,8 @@ model Orders {
 model ItemsOrder {
   Id          Int      @id @default(autoincrement())
   Service     String   @unique @db.VarChar(8)       // Código CUPS del servicio
-  Description String   @db.VarChar(240)             // Descripción médica
+  Description String   @db.VarChar(240)  
+  Quantity    Int           // Descripción médica
   orders      Orders   @relation(fields: [IdOrders], references: [IdOrders])
   IdOrders    Int      @unique
   services    Services @relation(fields: [Service], references: [CodeService])

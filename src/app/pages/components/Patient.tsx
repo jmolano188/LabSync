@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon, ViewIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import {Table,TableContainer,Tbody,Td,Th,Thead,Tr, Tooltip, Button, Input, Modal, ModalBody,  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,  useDisclosure, } from "@chakra-ui/react"
 import CreatePatient from "./CreatePatient";
+import CreateOrder from "./CreateOrder";
 
 async function loadPatients() {
   const res = await fetch("http://localhost:3000/api/patients");
@@ -12,14 +13,23 @@ async function loadPatients() {
 
 function Patient() {
   const [search,setSearch] = useState("")
+  const [ordenando,setOrdenando] = useState(false)
   const [creando,setCreando] = useState(false)
   const [editando, setEditando] = useState(false)
   const [creado, setCreado] = useState(false)
   const [editarTabla, setEditarTabla] = useState(false)
   const [patient, setPatient] = useState(null)
   const [openModal1, setOpenModal1] = useState(false)
+  const [openModal2, setOpenModal2] = useState(false)
   const [deletePatient,setDeletedPatient] = useState(null)
   const [loading,setLoading] = useState(false)
+  
+
+  const handledCrearOrden =(row:any) =>{
+    setOrdenando(true)
+    setOpenModal2(true)
+    setPatient(row)
+  }
 
   const handledCreando = ()=>{
     setCreando(true)
@@ -57,6 +67,7 @@ function Patient() {
     setOpenModal1(true)
   }
   const onCloseModal1 =() =>setOpenModal1(false)
+  const onCloseModal2 =() =>setOpenModal2(false)
   const handleDeletePatient = async () =>{
     setLoading(true)
     const response = await fetch('/api/patients/'+deletePatient,{
@@ -82,6 +93,7 @@ function Patient() {
     };
     fetchData();
   }, [loading]);
+
   // Funcion de filtrado
   const searcher = (Event:any) =>{
     setSearch(Event.target.value)
@@ -147,7 +159,7 @@ function Patient() {
               </Button>
               </Tooltip>
               <Tooltip label ="Crear orden">
-              <Button w={10} borderRadius = "full" colorScheme="green" mr ={1}>
+              <Button onClick={()=>handledCrearOrden(patient)} w={10} borderRadius = "full" colorScheme="green" mr ={1}>
               <ExternalLinkIcon />
               </Button>
               </Tooltip>
@@ -176,6 +188,18 @@ function Patient() {
         creado ={creado}
         editarTabla={editarTabla}
         salir={closeCreatePatient}
+        patient = {patient}/>
+        </ModalBody>
+        </ModalContent>
+    </Modal>
+    <Modal closeOnOverlayClick={false} isOpen={openModal2} onClose={onCloseModal2} isCentered size={"6xl"}>
+    <ModalOverlay />
+        <ModalContent>
+        <ModalHeader></ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+        <CreateOrder
+        ordenando ={ordenando}
         patient = {patient}/>
         </ModalBody>
         </ModalContent>

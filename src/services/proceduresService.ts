@@ -9,7 +9,6 @@ export class proceduresService {
         return prisma.services.findMany()
     } catch (error) {
         console.log('Error al buscar el servicio');
-        
     }
     }
     findOne(codeservice: string) {
