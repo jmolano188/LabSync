@@ -1,14 +1,26 @@
-"use client";
-import { useEffect, useState } from "react";
-import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon, ViewIcon, WarningTwoIcon } from "@chakra-ui/icons";
-import {Table,TableContainer,Tbody,Td,Th,Thead,Tr, Tooltip, Button, Input, Modal, ModalBody,  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,  useDisclosure, } from "@chakra-ui/react"
-import CreatePatient from "./CreatePatient";
-import CreateOrder from "./CreateOrder";
+'use client'
+import {TableCell,Input,TableContainer,TableHead,TableRow,Paper,TablePagination,Button,Tooltip,Modal, Box,Table,TableBody, Dialog, DialogProps, DialogContent, IconButton, DialogActions, DialogTitle, } from '@mui/material';
+import { AddCircle ,Delete, Edit, EditNoteOutlined, RemoveRedEyeOutlined, WarningAmberRounded} from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import CreatePatient from './CreatePatient';
+import CreateOrder from './CreateOrder';
+//import CreatePatient from "./CreatePatient";
+//import CreateOrder from "./CreateOrder";
 
-async function loadPatients() {
-  const res = await fetch("http://localhost:3000/api/patients");
-  const response = await res.json();
-  return response;
+
+async function loadPatients(props:any) {
+  const res = await fetch('http://localhost:3000/api/patients/search',{
+    method: 'POST',
+    body: JSON.stringify({
+        page:props.page,
+        pageSize:props.rowsPerPage,
+        }),
+    headers:{
+        'content-type': 'aplication/json'
+    }})
+  console.log(res)
+  const response = await res.json()
+  return(response)
 }
 
 function Patient() {
@@ -19,12 +31,24 @@ function Patient() {
   const [creado, setCreado] = useState(false)
   const [editarTabla, setEditarTabla] = useState(false)
   const [patient, setPatient] = useState(null)
+  const [isOpen, setOpen] = useState(false)
   const [openModal1, setOpenModal1] = useState(false)
   const [openModal2, setOpenModal2] = useState(false)
   const [deletePatient,setDeletedPatient] = useState(null)
   const [loading,setLoading] = useState(false)
-  
-
+  const [totalPatients,settotalPatients]=useState(0)
+  const [page,setPage]=useState(0)  
+  const [rowsPerPage,setRowsPerPage] = useState(5)
+  const [fullWidth, setFullWidth] = useState(true);
+  const [maxWidth, setMaxWidth] = useState<DialogProps['maxWidth']>('lg');
+  const handledChangePage = (event:unknown,newPage:number)=>{
+    setPage(newPage)
+    setLoading(false)
+  }
+  const handledChangeRowsPerPage = (event:React.ChangeEvent<HTMLInputElement>)=>{
+    setRowsPerPage(parseInt(event.target.value,10))
+    setPage(0)
+  }
   const handledCrearOrden =(row:any) =>{
     setOrdenando(true)
     setOpenModal2(true)
@@ -38,7 +62,7 @@ function Patient() {
     setEditarTabla(false)
     setPatient(null)
     setLoading(true)
-    onOpen()
+    setOpen(true)
   }
   const handledEditando =(row:any)=>{
     setEditando(true)
@@ -47,7 +71,7 @@ function Patient() {
     setEditarTabla(true)
     setPatient(row)
     setLoading(true)
-    onOpen()
+    setOpen(true)
   }
   const handledVisualizar = (row:any) =>{
     setEditando(false)
@@ -56,7 +80,7 @@ function Patient() {
     setEditarTabla(false)
     setPatient(row)
     setLoading(false)
-    onOpen()
+    setOpen(true)
   }
   const handledEliminar = (row:any) =>{
     setEditando(false)
@@ -68,6 +92,7 @@ function Patient() {
   }
   const onCloseModal1 =() =>setOpenModal1(false)
   const onCloseModal2 =() =>setOpenModal2(false)
+  const onClose =()=>setOpen(false)
   const handleDeletePatient = async () =>{
     setLoading(true)
     const response = await fetch('/api/patients/'+deletePatient,{
@@ -84,15 +109,15 @@ function Patient() {
   }
 
   const [patients, setPatients] = useState<Array<any>>([]);
-  const { isOpen, onOpen, onClose } = useDisclosure()
   // traer datos del api
   useEffect(() => {
     const fetchData = async () => {
-      const response = await loadPatients();
-      setPatients(response);
+      const response = await loadPatients({page,rowsPerPage});
+      setPatients(response.patient);
+      settotalPatients(response.totalPatients)
     };
     fetchData();
-  }, [loading]);
+  }, [loading,rowsPerPage,page]);
 
   // Funcion de filtrado
   const searcher = (Event:any) =>{
@@ -106,82 +131,76 @@ function Patient() {
   }
   // Funcion de busqueda
   const results= !search ? patients : patients.filter(data => {
-    const name = `${data.FirstName}  ${data.SecondName} ${data.FirstLastName} ${data.SecondLastName}`
+    const name = `${data.FirstName} ${data.SecondName} ${data.FirstLastName} ${data.SecondLastName}`
     const res = name.toLowerCase().includes(search.toLowerCase())
     return res ? res: data.Identification.includes(search)
   }) 
   return (
 <div>
     <div className="flex-wrap" style={{marginTop:"20px",marginLeft:"50px", marginRight:"50px",marginBottom:"50px"}}>
-    <Input value = {search} onChange={searcher} type="text" placeholder="Search" 
-          focusBorderColor='black' border={"2px solid black"} width="500px" />
-      <Button onClick={handledCreando} colorScheme="green" ml={10} >
-      <AddIcon/>Crear paciente</Button>
+    <Input value = {search} onChange={searcher} type="text" placeholder="Search"/>
+      <Button onClick={handledCreando} startIcon={<AddCircle/>}>
+      Crear paciente</Button>
     </div> 
     <div  style={{marginTop:"50px",marginLeft:"50px", marginRight:"50px",marginBottom:"50px", border:"2px solid black "}} >
-    <TableContainer overflowX={"auto"} >
-      <Table variant="simple" colorScheme='black'>
-        <Thead backgroundColor={"#FF5B5E"}  >
-          <Tr >
-            <Th fontSize="lg"  >TIPO ID</Th>
-            <Th fontSize="lg"  >IDENTIFICACION</Th>
-            <Th fontSize="lg"  >NOMBRE</Th>
-            <Th fontSize="lg"  >FECHA NACIMIENTO</Th>
-            <Th fontSize="lg"   isNumeric>EDAD</Th>
-            <Th fontSize="lg"  >SEXO</Th>
-            <Th fontSize="lg"  >CELULAR</Th>
-            <Th fontSize="lg"  >CORREO</Th>
-            <Th fontSize="lg"  >ACCIONES</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead >
+          <TableRow>
+            <TableCell>TIPO ID</TableCell>
+            <TableCell>IDENTIFICACION</TableCell>
+            <TableCell>NOMBRE</TableCell>
+            <TableCell>FECHA NACIMIENTO</TableCell>
+            <TableCell>EDAD</TableCell>
+            <TableCell>SEXO</TableCell>
+            <TableCell>CELULAR</TableCell>
+            <TableCell>CORREO</TableCell>
+            <TableCell>ACCIONES</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {results.map((patient) => (
-            <Tr key={patient.IdPatient}>
-              <Td>{patient.TipeId}</Td>
-              <Td>{patient.Identification}</Td>
-              <Td >
+            <TableRow key={patient.IdPatient}>
+              <TableCell>{patient.TipeId}</TableCell>
+              <TableCell>{patient.Identification}</TableCell>
+              <TableCell >
               {patient.FirstName} {patient.SecondName} {patient.FirstLastName} {patient.SecondLastName}
-              </Td>
-              <Td >{patient.Birthdate.split('T')[0]}</Td>
-              <Td isNumeric>{patient.Age}</Td>
-              <Td>{patient.Gender}</Td>
-              <Td>{patient.Phone}</Td>
-              <Td>{patient.Email}</Td>
-              <Td> 
-              <Tooltip label ="Editar">
-              <Button onClick={() =>handledEditando(patient)} w={10} borderRadius = "full" colorScheme="yellow" mr ={1}>
-              <EditIcon />
-              </Button>
+              </TableCell>
+              <TableCell >{patient.Birthdate.split('T')[0]}</TableCell>
+              <TableCell >{patient.Age}</TableCell>
+              <TableCell>{patient.Gender}</TableCell>
+              <TableCell>{patient.Phone}</TableCell>
+              <TableCell>{patient.Email}</TableCell>
+              <TableCell> 
+              <Tooltip title ="Editar">
+              <IconButton onClick={() =>handledEditando(patient)}  color="info">
+                <Edit/>
+              </IconButton>
               </Tooltip>
-              <Tooltip label ="Visualizar">
-              <Button onClick={() => handledVisualizar(patient)} w={10} borderRadius = "full" colorScheme="blue" mr ={1}>
-              <ViewIcon />
-              </Button>
+              <Tooltip title ="Visualizar">
+              <IconButton onClick={() => handledVisualizar(patient)} color="secondary"><RemoveRedEyeOutlined/></IconButton>
               </Tooltip>
-              <Tooltip label ="Crear orden">
-              <Button onClick={()=>handledCrearOrden(patient)} w={10} borderRadius = "full" colorScheme="green" mr ={1}>
-              <ExternalLinkIcon />
-              </Button>
+              <Tooltip title ="Crear orden">
+              <IconButton onClick={()=>handledCrearOrden(patient)} color="success" ><EditNoteOutlined/></IconButton>
               </Tooltip>
-              <Tooltip label ="Eliminar">
-              <Button onClick={() => handledEliminar(patient)} w={10} borderRadius = "full" colorScheme="red" >
-              <DeleteIcon/>
-              </Button>
+              <Tooltip title ="Eliminar">
+              <IconButton onClick={() => handledEliminar(patient)} color="error" ><Delete/></IconButton>
               </Tooltip>
-              </Td>
-            </Tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </Tbody>
+        </TableBody>
       </Table>
     </TableContainer>
+    <TablePagination rowsPerPageOptions={[5,10]} component="div" 
+              count={totalPatients} rowsPerPage={rowsPerPage} page={page}
+              onPageChange={handledChangePage} onRowsPerPageChange={handledChangeRowsPerPage}
+              labelRowsPerPage="Registros por página"/>
   </div>
 
-<Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose} isCentered size={"6xl"}>
-<ModalOverlay />
-        <ModalContent>
-        <ModalHeader></ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
+<Dialog open={isOpen} onClose={onClose} fullWidth={fullWidth}
+        maxWidth={maxWidth}>
+    <DialogContent>
         <CreatePatient
         crear={creando}
         editar={editando}
@@ -189,44 +208,32 @@ function Patient() {
         editarTabla={editarTabla}
         salir={closeCreatePatient}
         patient = {patient}/>
-        </ModalBody>
-        </ModalContent>
-    </Modal>
-    <Modal closeOnOverlayClick={false} isOpen={openModal2} onClose={onCloseModal2} isCentered size={"6xl"}>
-    <ModalOverlay />
-        <ModalContent>
-        <ModalHeader></ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
+      </DialogContent>  
+</Dialog>
+
+    <Dialog open={openModal2} onClose={onCloseModal2} fullWidth={fullWidth}
+        maxWidth={maxWidth}>
         <CreateOrder
         ordenando ={ordenando}
-        patient = {patient}/>
-        </ModalBody>
-        </ModalContent>
-    </Modal>
+        patient = {patient}/> 
+    </Dialog>
   
-  <Modal closeOnOverlayClick={false} isOpen={openModal1} onClose={onCloseModal1} isCentered size={"lg"}>
-  <ModalOverlay />
-        <ModalContent>
-        <ModalHeader>
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
+  <Dialog open={openModal1} onClose={onCloseModal1} >
+       <DialogTitle>Confirmación</DialogTitle>
+       <DialogContent>
         <div >
-        <WarningTwoIcon color={"red"} boxSize={10} mr={4}/>
             <span style={{fontFamily:'Arial,sans-serif',fontSize:"20px"}}>
             ¿Seguro desea ELIMINAR el paciente?
         </span>
         </div>
-        </ModalBody>
-        <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleDeletePatient}>
+        </DialogContent>
+        <DialogActions>
+            <Button  onClick={handleDeletePatient} variant="contained" color="success">
             Si
             </Button>
-            <Button colorScheme="red" onClick={onCloseModal1}>No</Button>
-        </ModalFooter>
-        </ModalContent>
-    </Modal>
+            <Button  onClick={onCloseModal1} variant="contained" color="error">No</Button>
+        </DialogActions>
+    </Dialog>
 
 </div>
 

@@ -9,10 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.1.1",
-    "@chakra-ui/react": "^2.8.2",
+    "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.16",
+    "@mui/material": "^5.15.16",
+    "@mui/material-nextjs": "^5.15.11",
+    "@mui/x-data-grid": "^7.3.2",
     "@prisma/client": "^5.11.0",
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^5.1.1",

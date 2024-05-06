@@ -6,7 +6,7 @@ const tipoId =[
     {value: "CN", label: "CERTIFICADO DE NACIDO VIVO"}, 
     {value: "DE", label: "DOCUMENTO EXTERANJERO"}, 
     {value: "MS", label: "MENOR SIN IDENTIFICACION"}, 
-    {value: "NI", label: "NÚIMERO DE IDENTIFICACION TRIBUTARIO NIT"}, 
+    {value: "NI", label: "NIT"}, 
     {value: "NV", label: "CERTIFICADO NACIDO VIVO"},
     {value: "PA", label: "PASAPORTE "},
     {value: "PE", label: "PERMISO ESPECIAL DE PERMANENCIA"}, 

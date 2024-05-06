@@ -7,16 +7,18 @@ export async function GET() {
     const response = await patientService.findAll();
     return NextResponse.json(response);
 }
+function age(birthdate:string){
+   const CreateAt = new Date()
+   const fechaNacimiento = new Date(birthdate)
+   const agems = CreateAt.getTime() - fechaNacimiento.getTime();
+   const dateage = new Date(agems);
+   return Math.abs(dateage.getUTCFullYear()-1970)
+}
 
 export async function POST(req:Request) {
    const res = await req.json()
    console.log(res);
-   const CreateAt = new Date()
-   const fechaNacimiento = new Date(res.Birthdate)
-   const agems = CreateAt.getTime() - fechaNacimiento.getTime();
-   const dateage = new Date(agems);
-   const age = Math.abs(dateage.getUTCFullYear()-1970)
-   
+      const newAge = age(res.Birthdate)
       const response = await patientService.create({
       TipeId:res.TipeId,
       Identification: res.Identification,
@@ -25,7 +27,7 @@ export async function POST(req:Request) {
       FirstLastName: res.FirstLastName.toUpperCase(),
       SecondLastName: res.SecondLastName.toUpperCase(),
       Birthdate: res.Birthdate,
-      Age :age,
+      Age :newAge,
       Phone: res.Phone,
       Email: res.Email.toUpperCase(),
       Gender: res.Gender,
@@ -34,7 +36,20 @@ export async function POST(req:Request) {
 }
 export async function PUT(req:Request) {
    const res = await req.json()
-   const response = await patientService.update(res)
+   const newAge = age(res.Birthdate)
+   const response = await patientService.update({
+      IdPatient:res.IdPatient,
+      TipeId:res.TipeId,
+      FirstName: res.FirstName.toUpperCase(),
+      SecondName: res.SecondName.toUpperCase(),
+      FirstLastName: res.FirstLastName.toUpperCase(),
+      SecondLastName: res.SecondLastName.toUpperCase(),
+      Birthdate: res.Birthdate,
+      Age :newAge,
+      Phone: res.Phone,
+      Email: res.Email.toUpperCase(),
+      Gender: res.Gender
+   })
    return NextResponse.json(response);
 }
 

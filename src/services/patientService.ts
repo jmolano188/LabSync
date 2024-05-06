@@ -30,7 +30,7 @@ export class PatientService {
         }
     }
     async searchPagination(page:number=1,pageSize:number=10) {
-        const  offset = (page-1)*pageSize; 
+        const  offset = (page)*pageSize; 
         try {
             const patientPage = await prisma.patient.findMany({skip:offset,take:pageSize,orderBy:{CreateAt:'desc'}});
             console.log(patientPage)
@@ -64,6 +64,7 @@ export class PatientService {
                 Phone: objeto.Phone,
                 Email: objeto.Email,
                 Gender: objeto.Gender, 
+                Age: objeto.Age
             },
         });
     }

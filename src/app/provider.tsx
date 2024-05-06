@@ -1,8 +1,17 @@
-// app/providers.tsx
-'use client'
+'use client';
+import { Roboto } from 'next/font/google';
+import { createTheme } from '@mui/material/styles';
 
-import { ChakraProvider } from '@chakra-ui/react'
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+});
 
-export default function Providers({ children }: { children: React.ReactNode }) {
-  return <ChakraProvider>{children}</ChakraProvider>
-}
+const theme = createTheme({
+  typography: {
+    fontFamily: roboto.style.fontFamily,
+  },
+});
+
+export default theme;
